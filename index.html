@@ -1105,13 +1105,53 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 
 /* ── Contact form (mailto fallback) ── */
 function submitForm() {
-  const name = document.getElementById('f-name').value;
-  const email = document.getElementById('f-email').value;
-  const msg = document.getElementById('f-msg').value;
-  if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
-  const mailto = `mailto:akansha.subedi@gmail.com?subject=Portfolio Enquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(msg + '\n\nFrom: ' + name + ' <' + email + '>')}`;
-  window.location.href = mailto;
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const msg = document.getElementById('f-msg').value.trim();
+
+  document.querySelectorAll('.form-error').forEach(e => e.style.display = 'none');
+  document.querySelectorAll('.form-group input, .form-group textarea').forEach(e => e.style.borderColor = '');
+
+  let valid = true;
+  if (!name) {
+    document.getElementById('err-name').style.display = 'block';
+    document.getElementById('f-name').style.borderColor = '#e57373';
+    valid = false;
+  }
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!email || !emailOk) {
+    document.getElementById('err-email').style.display = 'block';
+    document.getElementById('f-email').style.borderColor = '#e57373';
+    valid = false;
+  }
+  if (!msg) {
+    document.getElementById('err-msg').style.display = 'block';
+    document.getElementById('f-msg').style.borderColor = '#e57373';
+    valid = false;
+  }
+  if (!valid) return;
+
+  const subject = `Portfolio Enquiry from ${name}`;
+  const body = `Hi Akansha,\n\n${msg}\n\n---\nFrom: ${name}\nEmail: ${email}`;
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&to=akansha.subedi@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  const btn = document.getElementById('form-btn');
+  btn.textContent = '✓ Opening Gmail…';
+  btn.style.background = '#8aad8f';
+  btn.disabled = true;
   document.getElementById('form-success').style.display = 'block';
+
+  window.open(gmailUrl, '_blank');
+
+  setTimeout(() => {
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-email').value = '';
+    document.getElementById('f-msg').value = '';
+    btn.textContent = 'Send Message →';
+    btn.style.background = '';
+    btn.disabled = false;
+    document.getElementById('form-success').style.display = 'none';
+  }, 3000);
 }
 </script>
 </body>
